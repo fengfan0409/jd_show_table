@@ -145,12 +145,23 @@ async function handle(){
     let timeout = parseInt(Math.random() * 2000) + 2000
     await sleep(timeout)
   }
+
   window.zhu = zhu
   window.qi = qi
   window.userList = userList
   console.log(zhu)
   console.log(qi)
   console.log(userList)
+
+  for (const key in userList) {
+    if (Object.hasOwnProperty.call(userList, key)) {
+      const value = userList[key];
+      if(value.zhu.joinCount + value.qi.joinCount > 1){
+        console.log(value)
+      }
+    }
+  }
+
 }
 
 export default handle;
