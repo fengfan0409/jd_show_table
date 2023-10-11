@@ -2,6 +2,7 @@
 <template>
   <div class=''>
     <el-button @click="spiderData">获取数据</el-button>
+    <el-button @click="initData">自动刷新开启</el-button>
     <div>
       <el-table
         :data="tableList"
@@ -213,7 +214,12 @@ export default {
     },
     init() {
       this.paiList = [
-        new PaiInfo(298642201, '28栋1单元30层3002号', 3466171, 115),
+        new PaiInfo(299394826, '7-1-1403', 822846, 115),
+        new PaiInfo(299398074, '7-1-1803', 822846, 115),
+        new PaiInfo(299404800, '7-2-1301', 822846, 115),
+        new PaiInfo(299395085, '7-1-1701', 881214, 126),
+        new PaiInfo(299398383, '7-1-801', 881214, 126),
+        new PaiInfo(299514528, '湖2-1-2401', 933633, 117),
       ];
     },
     initData() {
@@ -322,7 +328,7 @@ export default {
         this.timer = this.loopTimer(timeout, i);
         return;
       }
-      if (info.auctionStatus >= 2) {
+      if (info.auctionStatus != 1) {
         return
       }
       // 结束位-成交总数 < 5 结束位+10 保持结束位始终大于成交总数10
@@ -342,7 +348,7 @@ export default {
     this.init();
   },
   mounted() {
-    this.initData()
+    // this.initData()
   }
 }
 
