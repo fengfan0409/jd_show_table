@@ -1,7 +1,7 @@
 <!--  -->
 <template>
   <div class=''>
-    <div>列表</div>
+    <el-button @click="spiderData">获取数据</el-button>
     <div>
       <el-table
         :data="tableList"
@@ -183,6 +183,7 @@
 
 <script>
 import Axios from 'axios';
+import spider from '../../../components/spider/getcount.js'
 
 export default {
   name: '',
@@ -204,6 +205,9 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    spiderData(){
+      spider()
+    },
     openDialog(row, index) {
       this.detailRow = row; this.detailIndex = index; this.detailDialog = true;
     },

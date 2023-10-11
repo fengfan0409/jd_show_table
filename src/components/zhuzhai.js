@@ -1,4 +1,4 @@
-[
+export default [
     {
         "id": "288751643",
         "count": "333"

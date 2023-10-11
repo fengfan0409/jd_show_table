@@ -21,12 +21,6 @@ function getCount() {
 
 async function handle(){
   var userList = {
-    0:{
-      bidCount:100, // 出价次数
-      joinCount:10, // 参加次数
-      buyCount:1, // 成交次数
-      joinList:[219483153,219483156]
-    }
   }
 
   var zhu = getZ()
@@ -55,37 +49,115 @@ async function handle(){
         // info.currentPrice = obj.currentPrice || info.currentPrice;
         // info.endTime = obj.endTime || info.endTime;
         // info.bidCount = obj.bidCount || 0;
-        info.bidList = obj.bidList || [];
         // info.accessEnsureNum = obj.accessEnsureNum; // 报名人数
         // info.accessNum = obj.accessNum;// 围观人数
         // info.auctionStatus = obj.auctionStatus;// 0未开始，1已开始，2已结束
         // info.currentBidUserNumber = obj.currentBidUserNumber;
+        info.bidList = obj.bidList || [];
+        for (let i = 0; i < info.bidList.length; i++) {
+          const item = info.bidList[i];
+          let user = item.username
+          if(!userList[user]){
+            userList[user] = {
+              zhu:{
+                bidCount:0, // 出价次数
+                joinCount:0, // 参加次数
+                buyCount:0, // 成交次数
+                joinList:[]
+              },
+              qi:{
+                  bidCount:0, // 出价次数
+                  joinCount:0, // 参加次数
+                  buyCount:0, // 成交次数
+                  joinList:[]
+              },
+            }
+          }
+          userList[user].zhu.bidCount ++
+          if(userList[user].zhu.joinList.indexOf(paimaiId) === -1){
+            userList[user].zhu.joinCount ++
+            userList[user].zhu.joinList.push(paimaiId)
+          }
+          if(i === 0){
+            userList[user].zhu.buyCount ++
+          }
+        }
       }
     }
 
-    let timeout = parseInt(Math.random() * 3000) + 4000
+    let timeout = parseInt(Math.random() * 2000) + 2000
 
-    // 成交总数不等于已经加载出来的 需要立即加载
-    if (info.bidCount != info.bidList.length) {
-      timeout = 1000
-      info.end = parseInt(info.bidCount / 10) * 10 + 9
-      this.timer = this.loopTimer(timeout, i);
-      return;
-    }
-    if (info.auctionStatus >= 2) {
-      return
-    }
-    // 结束位-成交总数 < 5 结束位+10 保持结束位始终大于成交总数10
-    if (info.end - info.bidCount <= 5) {
-      info.end += 10
-    }
-    console.log(info)
-    this.timer = this.loopTimer(timeout, i);
+    await sleep(timeout)
 
   }
+  for (let i = 0; i < qi.length; i++) {
+    let info = qi[i];
+    let paimaiId = info.id, end = info.count, start = 0;
+    let jsonpData = `jsonp_${Date.now()}_${parseInt(Math.random() * 99999)}`
+    let res = await Axios.get('api', {
+      params: {
+        appid: 'paimai',
+        functionId: 'getPaimaiRealTimeData',
+        body: JSON.stringify({ "end": end, "paimaiId": paimaiId, "source": 0, "start": start }),
+        loginType: 3,
+        jsonp: jsonpData,
+      },
+    })
+    if (typeof res.data === 'string' && res.data.indexOf(jsonpData) > -1) {
+      let doJs = res.data || ''
+      doJs = doJs.replace(jsonpData + '(', '')
+      doJs = doJs.replace(');', '')
+      let raw = JSON.parse(doJs)
+      if (raw.message === '成功') {
+        let obj = raw.data
+        info.bidList = obj.bidList || [];
+        for (let i = 0; i < info.bidList.length; i++) {
+          const item = info.bidList[i];
+          let user = item.username
+          if(!userList[user]){
+            userList[user] = {
+              zhu:{
+                bidCount:0, // 出价次数
+                joinCount:0, // 参加次数
+                buyCount:0, // 成交次数
+                joinList:[]
+              },
+              qi:{
+                  bidCount:0, // 出价次数
+                  joinCount:0, // 参加次数
+                  buyCount:0, // 成交次数
+                  joinList:[]
+              },
+            }
+          }
+          userList[user].qi.bidCount ++
+          if(userList[user].qi.joinList.indexOf(paimaiId) === -1){
+            userList[user].qi.joinCount ++
+            userList[user].qi.joinList.push(paimaiId)
+          }
+          if(i === 0){
+            userList[user].qi.buyCount ++
+          }
+        }
+      }
+    }
+
+    let timeout = parseInt(Math.random() * 2000) + 2000
+    await sleep(timeout)
+  }
+  window.zhu = zhu
+  window.qi = qi
+  window.userList = userList
+  console.log(zhu)
+  console.log(qi)
+  console.log(userList)
 }
 
 export default handle;
+
+function sleep(time){
+  return new Promise((resolve) => setTimeout(resolve, time));
+ }
 
 function getZ() {
   var arr = [
